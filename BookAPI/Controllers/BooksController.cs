@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using BookAPI.Models;
 using Microsoft.OpenApi.Any;
+using System.Collections.Immutable;
 
 namespace BookAPI.Controllers
 {
@@ -46,8 +47,22 @@ namespace BookAPI.Controllers
 
         public ActionResult<Book> DisplayBook(string Name)
         {
-            var book = oBooks.SingleOrDefault(found => found.Name.ToLower().Contains(Name.ToLower()));
-            return Ok(book);
+            var books = oBooks.ToList();
+            List<Book> result = new List<Book>();
+            foreach (var book in books)
+            {
+                if (book.Name.ToLower().Contains(Name.ToLower()))
+                {
+                    result.Add(book);
+                }
+
+            }
+            if (result.Count == 0)
+            {
+                return NotFound("No Book found...!");
+            }
+
+            return Ok(result);
         }
 
         [HttpGet]
