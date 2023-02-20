@@ -12,9 +12,10 @@ namespace BookAPI.Controllers
         List<Book> oBooks = new List<Book>()
         {
             new Book(){ BookId = 1, Name="Book of Eli", Author="Shiela Canapi", AgeLimit=13, Price=1000,Publisher="Books Inc."},
-            new Book(){ BookId = 2, Name="Love and Hate", Author="Michael Rebutoc", AgeLimit=16, Price=1000,Publisher="Love Capsules Publisher"},
-            new Book(){ BookId = 3, Name="Story of Superbaby", Author="Abet Dela Cruz", AgeLimit=7, Price=1000,Publisher="Jone and Joy Publisher Inc"},
-            new Book(){ BookId = 4, Name="Book for Kids", Author="Jaypee Morgan", AgeLimit=5, Price=1000,Publisher="Best Book Publisher Inc"},
+            new Book(){ BookId = 2, Name="Love and Hate", Author="Michael Rebutoc", AgeLimit=16, Price=2000,Publisher="Love Capsules Publisher"},
+            new Book(){ BookId = 3, Name="Story of Superbaby", Author="Abet Dela Cruz", AgeLimit=7, Price=1500,Publisher="Jone and Joy Publisher Inc"},
+            new Book(){ BookId = 4, Name="Book for Kids", Author="Jaypee Morgan", AgeLimit=5, Price=500,Publisher="Best Book Publisher Inc"},
+            new Book(){ BookId = 4, Name="Book for Kids 2", Author="Jaypee Morgan", AgeLimit=5, Price=600,Publisher="Best Book Publisher Inc"},
         };
 
         [HttpGet]
@@ -50,7 +51,7 @@ namespace BookAPI.Controllers
         }
 
         [HttpGet]
-        [Route("DisplayByBookAgeLimit/{AgeLimit:int:min(1)}")]
+        [Route("DisplayByBookAgeLimit/{AgeLimit:int:range(1,100)}")]
 
         public ActionResult<Book> DisplayBookByAge (int AgeLimit)
         {
@@ -58,13 +59,36 @@ namespace BookAPI.Controllers
             List<Book> result = new List<Book>();
             foreach(var book in books)
             {
-                if(book.AgeLimit<=AgeLimit)
+                if(book.AgeLimit>=AgeLimit)
                 {
                     result.Add(book);
                 }
                 
             }
             if(result.Count==0)
+            {
+                return NotFound("No Book found...!");
+            }
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("DisplayByPrice/{price:double:range(100,10000)}")]
+
+        public ActionResult<Book> DisplayBookByPrice(double price)
+        {
+            var books = oBooks.ToList();
+            List<Book> result = new List<Book>();
+            foreach (var book in books)
+            {
+                if (book.Price <= price)
+                {
+                    result.Add(book);
+                }
+
+            }
+            if (result.Count == 0)
             {
                 return NotFound("No Book found...!");
             }
