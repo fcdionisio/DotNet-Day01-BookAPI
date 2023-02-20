@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BookAPI.Models;
+using Microsoft.OpenApi.Any;
 
 namespace BookAPI.Controllers
 {
@@ -8,46 +9,75 @@ namespace BookAPI.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
+        List<Book> oBooks = new List<Book>()
+        {
+            new Book(){ BookId = 1, Name="Book of Eli", Author="Shiela Canapi", AgeLimit=13, Price=1000,Publisher="Books Inc."},
+            new Book(){ BookId = 2, Name="Love and Hate", Author="Michael Rebutoc", AgeLimit=16, Price=1000,Publisher="Love Capsules Publisher"},
+            new Book(){ BookId = 3, Name="Story of Superbaby", Author="Abet Dela Cruz", AgeLimit=7, Price=1000,Publisher="Jone and Joy Publisher Inc"},
+            new Book(){ BookId = 4, Name="Book for Kids", Author="Jaypee Morgan", AgeLimit=5, Price=1000,Publisher="Best Book Publisher Inc"},
+        };
+
         [HttpGet]
         [Route("ListAll")]
         [Route("All")]
         [Route("ShowAll")]
-        public string ViewAllBooks()
+        public ActionResult<Book> ViewAllBooks()
         {
-            return "View ALL books...";
+            if(oBooks.Count == 0)
+            {
+                return NotFound("No Book found...!");
+            }
+
+            return Ok(oBooks);
         }
 
         [HttpGet]
-        [Route("Display/{id:int:min(1)}")]
+        [Route("Display/{BookId:int:min(1)}")]
 
-        public ActionResult<Book> DisplayBook(int id)
+        public ActionResult<Book> DisplayBook(int BookId)
         {
-            Book mybook = new Book() { BookId = id, Name = "Life of Ferdie", Author = "My self", AgeLimit = 18, Price = 32000, Publisher = "FCD Book Inc" };
-
-            return mybook;
+            var book = oBooks.SingleOrDefault(found=>found.BookId == BookId);
+            return Ok(book);
         }
 
         [HttpDelete]
-        [Route("Delete/{id:int:min(1)}")]
-        public string DeleteBook(int id)
+        [Route("Delete/{BookId:int:min(1)}")]
+        public ActionResult<Book> DeleteBook(int BookId)
         {
-            return $"Deleting a book with ID = {id}...";
+            var delBook = oBooks.SingleOrDefault(found => found.BookId == BookId);
+            if (delBook == null)
+            {
+                return NotFound("No Book found...!");
+            }
+            oBooks.Remove(delBook);
+            return Ok(oBooks);
         }
 
         [HttpPost]
         [Route("Save")]
-        public ActionResult<Book> SaveBook()
+        public ActionResult<Book> SaveBook(Book newBook)
         {
-            Book mybook = new Book() { BookId=1,Name="Life of Ferdie",Author="My self", AgeLimit = 18, Price=32000, Publisher="FCD Book Inc"};
-            return mybook;
+            oBooks.Add(newBook);
+            if (oBooks.Count == 0)
+            {
+                return NotFound("No Book found...!");
+            }
+
+            return Ok(oBooks);
         }
 
         [HttpPut]
-        [Route("Update/{id:int:min(1)}")]
-        public ActionResult<Book> UpdateBook(int Id)
+        [Route("Update/{BookId:int:min(1)}")]
+        public ActionResult<Book> UpdateBook(Book newBook, int BookId)
         {
-            Book mybook = new Book() { BookId = Id, Name = "Life of Ferdie", Author = "My self", AgeLimit = 18, Price = 32000, Publisher = "FCD Book Inc" };
-            return mybook;
+            var updateBook = oBooks.SingleOrDefault(found=>found.BookId==BookId);
+            if (updateBook == null)
+            {
+                return NotFound("No Book found...!");
+            }
+            oBooks.Remove(updateBook);
+            oBooks.Add(newBook);
+            return Ok(oBooks);
         }
 
     }
