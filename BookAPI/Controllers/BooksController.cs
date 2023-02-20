@@ -32,12 +32,44 @@ namespace BookAPI.Controllers
         }
 
         [HttpGet]
-        [Route("Display/{BookId:int:min(1)}")]
+        [Route("DisplayByBookId/{BookId:int:min(1)}")]
 
         public ActionResult<Book> DisplayBook(int BookId)
         {
             var book = oBooks.SingleOrDefault(found=>found.BookId == BookId);
             return Ok(book);
+        }
+
+        [HttpGet]
+        [Route("DisplayByBookName/{Name:alpha}")]
+
+        public ActionResult<Book> DisplayBook(string Name)
+        {
+            var book = oBooks.SingleOrDefault(found => found.Name.ToLower().Contains(Name.ToLower()));
+            return Ok(book);
+        }
+
+        [HttpGet]
+        [Route("DisplayByBookAgeLimit/{AgeLimit:int:min(1)}")]
+
+        public ActionResult<Book> DisplayBookByAge (int AgeLimit)
+        {
+            var books = oBooks.ToList();
+            List<Book> result = new List<Book>();
+            foreach(var book in books)
+            {
+                if(book.AgeLimit<=AgeLimit)
+                {
+                    result.Add(book);
+                }
+                
+            }
+            if(result.Count==0)
+            {
+                return NotFound("No Book found...!");
+            }
+
+            return Ok(result);
         }
 
         [HttpDelete]
